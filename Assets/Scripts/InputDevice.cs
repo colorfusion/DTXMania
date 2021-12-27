@@ -218,12 +218,7 @@ namespace Multimedia {
         private MidiHeader[] headers = new MidiHeader[HeaderCount];
 
         // Pointers to headers. 
-        private IntPtr[] ptrHeaders = new IntPtr[HeaderCount];       
-        
-        /// <summary>
-        /// Required designer variable.
-        /// </summary>
-        private System.ComponentModel.Container components = null;
+        private IntPtr[] ptrHeaders = new IntPtr[HeaderCount];
 
         #endregion
 
@@ -234,10 +229,6 @@ namespace Multimedia {
         /// </summary>
         public InputDevice()
         {
-            //
-            // Required for Windows.Forms Class Composition Designer support
-            //
-            InitializeComponent();
 
             InitializeInputDevice();
         }
@@ -252,12 +243,6 @@ namespace Multimedia {
         /// </param>
         public InputDevice(IContainer container)
         {
-            //
-            // Required for Windows.Forms Class Composition Designer support
-            //
-            container.Add(this);
-            InitializeComponent();
-
             InitializeInputDevice();
         }
 
@@ -270,11 +255,6 @@ namespace Multimedia {
         /// </param>
         public InputDevice(int deviceId)
         {
-            //
-            // Required for Windows.Forms Class Composition Designer support
-            //
-            InitializeComponent();
-
             InitializeInputDevice();
 
             // Open device.
@@ -294,12 +274,6 @@ namespace Multimedia {
         /// </param>
         public InputDevice(IContainer container, int deviceId)
         {
-            //
-            // Required for Windows.Forms Class Composition Designer support
-            //
-            container.Add(this);
-            InitializeComponent();
-
             InitializeInputDevice();
 
             // Open device.
@@ -307,17 +281,6 @@ namespace Multimedia {
         }
 
         #endregion        
-
-        #region Component Designer generated code
-        /// <summary>
-        /// Required method for Designer support - do not modify
-        /// the contents of this method with the code editor.
-        /// </summary>
-        private void InitializeComponent()
-        {
-            components = new System.ComponentModel.Container();
-        }
-        #endregion
 
         #region Methods
 
@@ -328,11 +291,6 @@ namespace Multimedia {
         {
             if( disposing )
             {
-                if(components != null)
-                {
-                    components.Dispose();
-                }
-
                 if(IsOpen())
                 {
                     if(IsRecording())
