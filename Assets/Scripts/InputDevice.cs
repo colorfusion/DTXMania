@@ -5,8 +5,9 @@ using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
+using UnityEngine;
 
-namespace Multimedia {
+namespace Multimedia.Midi {
 
     /// <summary>
     /// Represents the Windows Multimedia MidiHDR structure.
@@ -39,22 +40,22 @@ namespace Multimedia {
         /// <summary>
         /// Occurs when a channel message is received.
         /// </summary>
-        // event ChannelMessageEventHandler ChannelMessageReceived;
+        event ChannelMessageEventHandler ChannelMessageReceived;
 
         /// <summary>
         /// Occures when a system common message is received.
         /// </summary>
-        // event SysCommonEventHandler SysCommonReceived;
+        event SysCommonEventHandler SysCommonReceived;
 
         /// <summary>
         /// Occurs when a system exclusive message is received.
         /// </summary>
-        // event SysExEventHandler SysExReceived;
+        event SysExEventHandler SysExReceived;
 
         /// <summary>
         /// Occurs when a system realtime message is received.
         /// </summary>
-        // event SysRealtimeEventHandler SysRealtimeReceived;
+        event SysRealtimeEventHandler SysRealtimeReceived;
 
         /// <summary>
         /// Occures when an invalid short message is received.
@@ -120,14 +121,14 @@ namespace Multimedia {
     /// <summary>
     /// Represents Midi input devices.
     /// </summary>
-    public class InputDevice : System.ComponentModel.Component, IMidiReceiver
+    public class InputDevice : IMidiReceiver
     {
         #region InputDevice Members
 
         #region Delegates
 
         // Represents the method that handles messages from Windows.
-        private delegate void MidiInProc(int handle, int msg, int instance,
+        private delegate void MidiInProc(IntPtr handle, int msg, int instance,
             int param1, int param2); 
 
         #endregion
@@ -135,32 +136,32 @@ namespace Multimedia {
         #region Win32 Midi Input Functions and Constants
 
         [DllImport("winmm.dll")]
-        private static extern int midiInOpen(ref int handle, int deviceId,
+        private static extern int midiInOpen(ref IntPtr handle, int deviceId,
             MidiInProc proc, int instance, int flags);
 
         [DllImport("winmm.dll")]
-        private static extern int midiInClose(int handle);
+        private static extern int midiInClose(IntPtr handle);
 
         [DllImport("winmm.dll")]
-        private static extern int midiInStart(int handle);
+        private static extern int midiInStart(IntPtr handle);
 
         [DllImport("winmm.dll")]
-        private static extern int midiInReset(int handle);
+        private static extern int midiInReset(IntPtr handle);
 
         [DllImport("winmm.dll")]
-        private static extern int midiInPrepareHeader(int handle, 
+        private static extern int midiInPrepareHeader(IntPtr handle, 
             IntPtr header, int sizeOfmidiHeader);
 
         [DllImport("winmm.dll")]
-        private static extern int midiInUnprepareHeader(int handle, 
+        private static extern int midiInUnprepareHeader(IntPtr handle, 
             IntPtr header, int sizeOfmidiHeader);
 
         [DllImport("winmm.dll")]
-        private static extern int midiInAddBuffer(int handle, 
+        private static extern int midiInAddBuffer(IntPtr handle, 
             IntPtr header, int sizeOfmidiHeader);
 
         [DllImport("winmm.dll")]
-        private static extern int midiInGetDevCaps(int handle, 
+        private static extern int midiInGetDevCaps(int deviceID, 
             ref MidiInCaps caps, int sizeOfmidiInCaps);
 
         [DllImport("winmm.dll")]
@@ -188,7 +189,10 @@ namespace Multimedia {
         #region Fields
 
         // Device handle.
-        private int handle;
+        private IntPtr handle;
+
+        // Device name
+        private string deviceName;
 
         // device Identifier.
         private int deviceId;
@@ -254,7 +258,7 @@ namespace Multimedia {
         /// <summary> 
         /// Clean up any resources being used.
         /// </summary>
-        protected override void Dispose( bool disposing )
+        public void Dispose( bool disposing )
         {
             if( disposing )
             {
@@ -268,7 +272,6 @@ namespace Multimedia {
                     Close();
                 }
             }
-            base.Dispose( disposing );
         }
 
         /// <summary>
@@ -331,7 +334,7 @@ namespace Multimedia {
         /// <summary>
         /// Handles messages from Windows.
         /// </summary>
-        private void OnMessage(int handle, int msg, int instance,
+        private void OnMessage(IntPtr handle, int msg, int instance,
             int param1, int param2)
         { 
             // Only respond to messages if the device is in fact recording.
@@ -340,7 +343,7 @@ namespace Multimedia {
                 if(msg == MIM_DATA || msg == MIM_ERROR || msg == MIM_LONGDATA)
                 {
                     syncMsgQueue.Enqueue(new Message(msg, param1, param2));
-                    resetEvent.Set();            
+                    resetEvent.Set();
                 }
             }
         }
@@ -413,7 +416,6 @@ namespace Multimedia {
         /// </param>
         private void DispatchShortMessage(int message, int timeStamp)
         {
-            /*
             // Unpack status value.
             int status = ShortMessage.UnpackStatus(message);
 
@@ -466,7 +468,6 @@ namespace Multimedia {
                     SysRealtimeReceived(this, e);
                 }
             }
-            */
         }
 
         /// <summary>
@@ -503,7 +504,6 @@ namespace Multimedia {
         /// </param>
         private void ManageSysExMessage(int param1, int timeStamp)
         {
-            /*
             // Get pointer to header.
             IntPtr ptrHeader = new IntPtr(param1);
 
@@ -542,7 +542,6 @@ namespace Multimedia {
         /// </param>
         private void DispatchSysExMessage(MidiHeader header, int timeStamp)
         {
-            /*
             // Create array for holding system exclusive data.
             byte[] data = new byte[header.bytesRecorded - 1];
 
@@ -561,7 +560,6 @@ namespace Multimedia {
 
             // Raise event.
             SysExReceived(this, new SysExEventArgs(msg, timeStamp));
-            */
         }
 
         /// <summary>
@@ -685,6 +683,13 @@ namespace Multimedia {
 
             // Keep track of device Identifier.
             this.deviceId = deviceId;
+
+            // Retrieve the device name
+            MidiInCaps deviceCap = GetCapabilities(deviceId);
+            string deviceName = Encoding.UTF8.GetString(deviceCap.name);
+            deviceName = deviceName.Substring(0, deviceName.IndexOf('\0'));
+
+            this.deviceName = deviceName;
         }     
         
         /// <summary>
@@ -723,7 +728,7 @@ namespace Multimedia {
         /// <summary>
         /// Gets the device handle.
         /// </summary>
-        public int DeviceHandle
+        public IntPtr DeviceHandle
         {
             get
             {
@@ -742,6 +747,14 @@ namespace Multimedia {
             }
         }
 
+        public string DeviceName
+        {
+            get
+            {
+                return deviceName;
+            }
+        }
+
         #endregion
 
         #endregion
@@ -753,22 +766,22 @@ namespace Multimedia {
         /// <summary>
         /// Occurs when a channel message is received.
         /// </summary>
-        // public event ChannelMessageEventHandler ChannelMessageReceived;
+        public event ChannelMessageEventHandler ChannelMessageReceived;
 
         /// <summary>
         /// Occurs when a system common message is received.
         /// </summary>
-        // public event SysCommonEventHandler SysCommonReceived;
+        public event SysCommonEventHandler SysCommonReceived;
 
         /// <summary>
         /// Occurs when a system exclusive message is received.
         /// </summary>
-        // public event SysExEventHandler SysExReceived;
+        public event SysExEventHandler SysExReceived;
 
         /// <summary>
         /// Occurs when a system realtime message is received.
         /// </summary>
-        // public event SysRealtimeEventHandler SysRealtimeReceived;
+        public event SysRealtimeEventHandler SysRealtimeReceived;
 
         /// <summary>
         /// Occurs when an invalid short message is received.
