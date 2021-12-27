@@ -19,6 +19,7 @@ public class MIDIControllerTest : MonoBehaviour
         if (inputDeviceCount >= 1)
         {
             inputDevice = new InputDevice(0);
+            inputDevice.ChannelMessageReceived += new ChannelMessageEventHandler(OnChannelMessage);
             inputDevice.Start();
 
             Debug.Log(string.Format("Device {0} is loaded", inputDevice.DeviceName, 1));
@@ -29,6 +30,14 @@ public class MIDIControllerTest : MonoBehaviour
     void Update()
     {
         
+    }
+
+    void OnChannelMessage(object sender, ChannelMessageEventArgs e)
+    {
+        InputDevice device = (InputDevice)sender;
+        ChannelMessage message = e.Message;
+
+        Debug.Log(string.Format("{0} Note pressed: {1} | Velocity: {2}", device.DeviceName, message.Data1, message.Data2));
     }
 
     void OnApplicationQuit()
