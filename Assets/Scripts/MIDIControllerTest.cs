@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using System;
 using UnityEngine;
-using Multimedia;
+using Multimedia.Midi;
 
 public class MIDIControllerTest : MonoBehaviour
 {
@@ -17,12 +18,10 @@ public class MIDIControllerTest : MonoBehaviour
 
         if (inputDeviceCount >= 1)
         {
-            MidiInCaps inputCap = InputDevice.GetCapabilities(0);
-            inputDeviceName = Encoding.UTF8.GetString(inputCap.name);
-
-            Debug.Log(string.Format("Loading {0}",inputDeviceName));
             inputDevice = new InputDevice(0);
             inputDevice.Start();
+
+            Debug.Log(string.Format("Device {0} is loaded", inputDevice.DeviceName, 1));
         }
     }
 
