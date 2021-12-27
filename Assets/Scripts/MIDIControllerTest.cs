@@ -32,11 +32,11 @@ public class MIDIControllerTest : MonoBehaviour
         
     }
 
-    void OnDestroy()
+    void OnApplicationQuit()
     {
         if (inputDevice != null)
         {
-            inputDevice.Dispose();
+            inputDevice.Close();
         }
     }
 }
