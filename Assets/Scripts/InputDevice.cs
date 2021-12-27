@@ -234,19 +234,6 @@ namespace Multimedia {
         }
 
         /// <summary>
-        /// Initializes an instance of the InputDevice class with the specified
-        /// component container.
-        /// </summary>
-        /// <param name="container">
-        /// The component container to add this instance of the InputDevice 
-        /// class.
-        /// </param>
-        public InputDevice(IContainer container)
-        {
-            InitializeInputDevice();
-        }
-
-        /// <summary>
         /// Initializes a new instance of the InputDevice class with the 
         /// specified device Id.
         /// </summary>
@@ -254,25 +241,6 @@ namespace Multimedia {
         /// The device Id.
         /// </param>
         public InputDevice(int deviceId)
-        {
-            InitializeInputDevice();
-
-            // Open device.
-            Open(deviceId);
-        }
-
-        /// <summary>
-        /// Initializes an instance of the InputDevice class with the specified
-        /// component container and device Id.
-        /// </summary>
-        /// <param name="container">
-        /// The component container to add this instance of the InputDevice 
-        /// class.
-        /// </param>
-        /// <param name="deviceId">
-        /// The device Id.
-        /// </param>
-        public InputDevice(IContainer container, int deviceId)
         {
             InitializeInputDevice();
 
