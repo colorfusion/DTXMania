@@ -24,17 +24,17 @@ public class DTXInputOutput
 
     public struct MusicInfo
     {
-        public string Title = "";
-        public string ArtistName = "";
-        public string Comment = "";
-        public string Genre = "";
-        public string PreviewImage = "";
-        public string PreviewMovie = "";
-        public string PreviewSound = "";
-        public string BackgroundImage = "";
-        public string Level = "";
-        public double BPM = 120.0;
-        public int Duration = 0;
+        public string Title;
+        public string ArtistName;
+        public string Comment;
+        public string Genre;
+        public string PreviewImage;
+        public string PreviewMovie;
+        public string PreviewSound;
+        public string BackgroundImage;
+        public string Level;
+        public double BPM;
+        public int Duration;
     }         
     #endregion
 
@@ -103,6 +103,8 @@ public class DTXInputOutput
                 // ignore lines that are not command parameters
                 continue;
             }
+
+
         }
 
         return true;
