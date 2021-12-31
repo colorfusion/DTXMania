@@ -35,7 +35,13 @@ public class DTXInputOutput
         public string Level;
         public double BPM;
         public int Duration;
-    }         
+    }
+
+    public struct CommandObject
+    {
+        public string Command;
+        public string Value;
+    }
     #endregion
 
     #region Static Methods
@@ -44,6 +50,19 @@ public class DTXInputOutput
         DTXInputOutput dtxIO = new DTXInputOutput();
         dtxIO.LoadFile(filePath);
         return dtxIO;
+    }
+
+    public static CommandObject BuildCommand(string commandLine)
+    {
+        CommandObject commandObject = new CommandObject();
+        
+        List<string> commandArr = new List<string>(commandLine.Substring(1).Split(':'));
+
+        commandObject.Command = commandArr[0];
+        commandArr.RemoveAt(0);
+        commandObject.Value = string.Concat(commandArr);
+
+        return commandObject;
     }
     #endregion
 
