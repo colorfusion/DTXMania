@@ -150,27 +150,27 @@ public class DTXInputOutput
             {
                 musicInfo.ArtistName = commandObject.Value;
             }
-            else if (command.Equals("PREVIEW"))
+            else if (command.Equals("preview"))
             {
                 musicInfo.PreviewSound = commandObject.Value;
             }
-            else if (command.Equals("PREIMAGE"))
+            else if (command.Equals("preimage"))
             {
                 musicInfo.PreviewImage = commandObject.Value;
             }
-            else if (command.Equals("PREMOVIE"))
+            else if (command.Equals("premovie"))
             {
                 musicInfo.PreviewMovie = commandObject.Value;
             }
-            else if (command.Equals("BACKGROUND"))
+            else if (command.Equals("background"))
             {
                 musicInfo.BackgroundImage = commandObject.Value;
             }
-            else if (command.Equals("BPM"))
+            else if (command.Equals("bpm"))
             {
                 musicInfo.BPM = Convert.ToDouble(commandObject.Value);
             }
-            else if (command.Equals("DLEVEL"))
+            else if (command.Equals("dlevel"))
             {
                 musicInfo.Level = commandObject.Value;
             }
