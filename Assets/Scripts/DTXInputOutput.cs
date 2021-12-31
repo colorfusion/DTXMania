@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Text.RegularExpressions;
 using System;
 using UnityEngine;
 
@@ -42,6 +43,22 @@ public class DTXInputOutput
         public string Command;
         public string Value;
     }
+
+    public struct ChipInfo
+    {
+        public AudioClip AudioClip;
+        public bool IsChipLoaded;
+        public int Volume;
+        public int Pan;
+
+        public bool IsVisible;
+    }
+
+    public struct Chip
+    {
+        public int ChipIndex;
+        public int Time;
+    }
     #endregion
 
     #region Static Methods
@@ -74,6 +91,8 @@ public class DTXInputOutput
     private OperationType ioType;
     public MusicInfo musicInfo;
     public FileInformation fileInfo;
+
+    public List<ChipInfo> chipList;
     #endregion
 
     #region Methods
@@ -119,9 +138,26 @@ public class DTXInputOutput
         foreach(string fileLine in textInputArray)
         {
             string[] commandGroup = fileLine.Trim().Split('\n');
-            if (IsMusicInfo(commandGroup))
+            CommandObject commandObject = BuildCommand(commandGroup[0]);
+            if (IsMusicInfo(commandObject))
             {
                 SetupMusicInfo(commandGroup);
+            }
+            else if (IsChipInfo(commandObject))
+            {
+                SetupChipInfo(commandGroup);
+            }
+            else if (IsAVIInfo(commandObject))
+            {
+                SetupAVIInfo(commandGroup);
+            }
+            else if (IsBPMInfo(commandObject))
+            {
+                SetupBPMInfo(commandGroup);
+            }
+            else if (IsSongChipInfo(commandObject))
+            {
+                SetupSongChipInfo(commandGroup);
             }
         }
 
