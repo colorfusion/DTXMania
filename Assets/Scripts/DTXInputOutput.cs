@@ -84,7 +84,7 @@ public class DTXInputOutput
         return filePath;
     }
     
-    public void SetupFileInfo(string absolutePath)
+    private void SetupFileInfo(string absolutePath)
     {
         fileInfo = new FileInformation();
         fileInfo.AbsoluteFilePath = absolutePath;
@@ -95,7 +95,7 @@ public class DTXInputOutput
         fileInfo.LastModified = fi.LastWriteTime;
     }
 
-    public string ProcessInputBuffer(string inputBuffer)
+    private string ProcessInputBuffer(string inputBuffer)
     {
         inputBuffer = inputBuffer.Replace(Environment.NewLine, "\n");
         inputBuffer = inputBuffer.Replace('\t', ' ');
