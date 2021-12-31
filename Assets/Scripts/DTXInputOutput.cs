@@ -98,7 +98,7 @@ public class DTXInputOutput
 
         foreach(string fileLine in textInputArray)
         {
-            if (fileLine[0] != CommandPrefix)
+            if (!IsValidCommand(fileLine))
             {
                 // ignore lines that are not command parameters
                 continue;
@@ -108,6 +108,11 @@ public class DTXInputOutput
         }
 
         return true;
+    }
+
+    private bool IsValidCommand(string command)
+    {
+        return command.Length != 0 && command[0] == CommandPrefix;
     }
     #endregion
 }
