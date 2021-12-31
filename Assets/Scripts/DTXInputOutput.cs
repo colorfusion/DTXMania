@@ -60,7 +60,7 @@ public class DTXInputOutput
 
         commandObject.Command = commandArr[0];
         commandArr.RemoveAt(0);
-        commandObject.Value = string.Concat(commandArr);
+        commandObject.Value = string.Concat(commandArr).Trim();
 
         return commandObject;
     }
