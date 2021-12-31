@@ -86,11 +86,12 @@ public class DTXInputOutput
     
     private void SetupFileInfo(string absolutePath)
     {
+        FileInfo fi = new System.IO.FileInfo(absolutePath);
+
         fileInfo = new FileInformation();
-        fileInfo.AbsoluteFilePath = absolutePath;
+        fileInfo.AbsoluteFilePath = fi.FullName;
         fileInfo.AbsoluteFolderPath = System.IO.Path.GetDirectoryName(fileInfo.AbsoluteFilePath);
 
-        FileInfo fi = new System.IO.FileInfo(absolutePath);
         fileInfo.FileSize = fi.Length;
         fileInfo.LastModified = fi.LastWriteTime;
     }
