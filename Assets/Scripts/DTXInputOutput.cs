@@ -177,20 +177,54 @@ public class DTXInputOutput
         }
     }
 
+    private void SetupChipInfo(string[] commandGroup)
+    {
+        chipList = new List<ChipInfo>();
+    }
+
+    private void SetupAVIInfo(string[] commandGroup)
+    {
+
+    }
+
+    private void SetupBPMInfo(string[] commandGroup)
+    {
+
+    }
+
+    private void SetupSongChipInfo(string[] commandGroup)
+    {
+
+    }
+
     private bool IsValidCommand(string command)
     {
         return command.Length != 0 && command[0] == CommandPrefix && command.Split(':').Length >= 2;
     }
 
-    private bool IsMusicInfo(string[] commandGroup)
-    {
-        CommandObject commandObject = BuildCommand(commandGroup[0]);
-        return IsMusicInfoStart(commandObject);
-    }
-
-    private bool IsMusicInfoStart(CommandObject commandObject)
+    private bool IsMusicInfo(CommandObject commandObject)
     {
         return commandObject.Command.ToLower().Equals("title");
+    }
+
+    private bool IsChipInfo(CommandObject commandObject)
+    {
+        return commandObject.Command.Substring(0, 3).ToLower().Equals("wav");
+    }
+
+    private bool IsAVIInfo(CommandObject commandObject)
+    {
+        return commandObject.Command.Substring(0, 3).ToLower().Contains("avi");
+    }
+
+    private bool IsBPMInfo(CommandObject commandObject)
+    {
+        return commandObject.Command.Substring(0, 3).ToLower().Contains("bpm");
+    }
+
+    private bool IsSongChipInfo(CommandObject commandObject)
+    {
+        return Regex.IsMatch(commandObject.Command.ToLower(), @"[0-9A-Z]{5}");
     }
     #endregion
 }
