@@ -111,27 +111,85 @@ public class DTXInputOutput
         StreamReader inputStream = new StreamReader(fileInfo.AbsoluteFilePath, Encoding.GetEncoding( "shift-jis" ));
         string textInputBuffer = ProcessInputBuffer(inputStream.ReadToEnd());
         inputStream.Close();
-        string[] textInputArray = textInputBuffer.Split('\n');
+        string[] textInputArray = textInputBuffer.Split(new string[]{"\n\n"}, StringSplitOptions.RemoveEmptyEntries);
 
         musicInfo = new MusicInfo();
 
         foreach(string fileLine in textInputArray)
         {
-            if (!IsValidCommand(fileLine))
+            string[] commandGroup = fileLine.Trim().Split('\n');
+            if (IsMusicInfo(commandGroup))
             {
-                // ignore lines that are not command parameters
-                continue;
+                SetupMusicInfo(commandGroup);
             }
-
-
         }
 
         return true;
     }
 
+    private void SetupMusicInfo(string[] commandGroup)
+    {
+        musicInfo = new MusicInfo();
+        foreach(string commandString in commandGroup)
+        {
+            if (!IsValidCommand(commandString))
+            {
+                // ignore lines that are not command parameters
+                continue;
+            }
+
+            CommandObject commandObject = BuildCommand(commandString);
+            string command = commandObject.Command.ToLower();
+
+            if (command.Equals("title"))
+            {
+                musicInfo.Title = commandObject.Value;
+            }
+            else if (command.Equals("artist"))
+            {
+                musicInfo.ArtistName = commandObject.Value;
+            }
+            else if (command.Equals("PREVIEW"))
+            {
+                musicInfo.PreviewSound = commandObject.Value;
+            }
+            else if (command.Equals("PREIMAGE"))
+            {
+                musicInfo.PreviewImage = commandObject.Value;
+            }
+            else if (command.Equals("PREMOVIE"))
+            {
+                musicInfo.PreviewMovie = commandObject.Value;
+            }
+            else if (command.Equals("BACKGROUND"))
+            {
+                musicInfo.BackgroundImage = commandObject.Value;
+            }
+            else if (command.Equals("BPM"))
+            {
+                musicInfo.BPM = Convert.ToDouble(commandObject.Value);
+            }
+            else if (command.Equals("DLEVEL"))
+            {
+                musicInfo.Level = commandObject.Value;
+            }
+        }
+    }
+
     private bool IsValidCommand(string command)
     {
-        return command.Length != 0 && command[0] == CommandPrefix;
+        return command.Length != 0 && command[0] == CommandPrefix && command.Split(':').Length >= 2;
+    }
+
+    private bool IsMusicInfo(string[] commandGroup)
+    {
+        CommandObject commandObject = BuildCommand(commandGroup[0]);
+        return IsMusicInfoStart(commandObject);
+    }
+
+    private bool IsMusicInfoStart(CommandObject commandObject)
+    {
+        return commandObject.Command.ToLower().Equals("title");
     }
     #endregion
 }
