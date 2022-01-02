@@ -8,12 +8,9 @@ public class DTXFileLoadTest : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        DTXInputOutput dtxIO = DTXInputOutput.Load("Sing Alive (Full Version)/adv.dtx");
-        StartCoroutine(PlayPreview(dtxIO.musicInfo.PreviewSound));
-    }
+        DTXInputOutput dtxIO = GetComponent<DTXInputOutput>();
+        dtxIO.LoadFile("Sing Alive (Full Version)/adv.dtx");
 
-    IEnumerator PlayPreview(string audioPath)
-    {
         AudioSource audioSource = gameObject.GetComponent<AudioSource>();
         if (audioSource == null)
         {

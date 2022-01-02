@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 using System;
 using UnityEngine;
 
-public class DTXInputOutput
+public class DTXInputOutput : MonoBehaviour
 {
     #region Internal Structs
     public enum OperationType
@@ -62,13 +62,6 @@ public class DTXInputOutput
     #endregion
 
     #region Static Methods
-    public static DTXInputOutput Load(string filePath)
-    {
-        DTXInputOutput dtxIO = new DTXInputOutput();
-        dtxIO.LoadFile(filePath);
-        return dtxIO;
-    }
-
     public static CommandObject BuildCommand(string commandLine)
     {
         CommandObject commandObject = new CommandObject();
