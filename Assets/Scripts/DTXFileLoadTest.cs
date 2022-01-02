@@ -19,20 +19,12 @@ public class DTXFileLoadTest : MonoBehaviour
             audioSource = gameObject.AddComponent<AudioSource>();
         }
 
-        using(UnityWebRequest uwr = UnityWebRequestMultimedia.GetAudioClip(audioPath, AudioType.OGGVORBIS))
-        {
-            yield return uwr.SendWebRequest();
+        StartCoroutine(DTXHelper.GetAudioClip(dtxIO.musicInfo.PreviewSound, (audioClip) => {
+            // Debug.Log(string.Format("Playing {0}", dtxIO.musicInfo.PreviewSound));
+            // audioSource.PlayOneShot(audioClip);
+        }, () => {
             
-            if (uwr.result != UnityWebRequest.Result.Success) {
-                Debug.LogError(uwr.error);
-                yield break;
-            }
-
-            Debug.Log(string.Format("Playing {0}", audioPath));
-            AudioClip clip = DownloadHandlerAudioClip.GetContent(uwr);
-            // use audio clip
-            audioSource.PlayOneShot(clip);
-        }
+        }));
     }
 
     // Update is called once per frame
