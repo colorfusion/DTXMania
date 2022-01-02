@@ -22,7 +22,7 @@ public class DTXFileLoadTest : MonoBehaviour
         StartCoroutine(DTXHelper.GetAudioClip(dtxIO.musicInfo.PreviewSound, (audioClip) => {
             // Debug.Log(string.Format("Playing {0}", dtxIO.musicInfo.PreviewSound));
             // audioSource.PlayOneShot(audioClip);
-        }, () => {
+        }, (errorMsg) => {
             
         }));
     }

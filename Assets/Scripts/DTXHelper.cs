@@ -30,7 +30,7 @@ public class DTXHelper
         return digit2 * 36 + digit1;
     }
 
-    public static IEnumerator GetAudioClip(string audioPath, Action<AudioClip> successCallback, Action failCallback)
+    public static IEnumerator GetAudioClip(string audioPath, Action<AudioClip> successCallback, Action<string> failCallback)
     {
         Debug.Log(string.Format("Loading {0}",audioPath));
         using(UnityWebRequest uwr = UnityWebRequestMultimedia.GetAudioClip(audioPath, AudioType.OGGVORBIS))
@@ -38,8 +38,8 @@ public class DTXHelper
             yield return uwr.SendWebRequest();
             
             if (uwr.result != UnityWebRequest.Result.Success) {
-                Debug.LogError(uwr.error);
-                failCallback();
+                // Debug.LogError(uwr.error);
+                failCallback(uwr.error);
                 yield break;
             }
 

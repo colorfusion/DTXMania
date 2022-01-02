@@ -255,7 +255,7 @@ public class DTXInputOutput : MonoBehaviour
                     currentChip.AudioClip = audioClip;
                     currentChip.IsChipLoaded = true;
                     Debug.Log("Chip loaded");
-                }, () => {
+                }, (errorMsg) => {
                     Debug.LogError(string.Format("Error loading {0}", filePath));
                 }));
             }
