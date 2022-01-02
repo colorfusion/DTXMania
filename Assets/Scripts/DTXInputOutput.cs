@@ -48,6 +48,7 @@ public class DTXInputOutput : MonoBehaviour
     {
         public AudioClip AudioClip;
         public bool IsChipLoaded;
+        public bool IsBGM;
         public int Volume;
         public int Pan;
 
@@ -85,7 +86,7 @@ public class DTXInputOutput : MonoBehaviour
     public MusicInfo musicInfo;
     public FileInformation fileInfo;
 
-    public List<ChipInfo> chipList;
+    public Dictionary<int, ChipInfo> chipList;
     #endregion
 
     #region Methods
@@ -164,6 +165,7 @@ public class DTXInputOutput : MonoBehaviour
 
     private void SetupMusicInfo(string[] commandGroup)
     {
+        Debug.Log("Loading Music Info");
         musicInfo = new MusicInfo();
         foreach(string commandString in commandGroup)
         {
@@ -213,7 +215,64 @@ public class DTXInputOutput : MonoBehaviour
 
     private void SetupChipInfo(string[] commandGroup)
     {
-        chipList = new List<ChipInfo>();
+        Debug.Log("Loading Chip Info");
+        chipList = new Dictionary<int, ChipInfo>();
+
+        ChipInfo currentChip = new ChipInfo();
+        bool isChipValid = false;
+        foreach(string commandString in commandGroup)
+        {
+            if (!IsValidCommand(commandString))
+            {
+                // ignore lines that are not command parameters
+                continue;
+            }
+
+            CommandObject commandObject = BuildCommand(commandString);
+            string chipCommand = commandObject.Command;
+            string chipCommandLower = chipCommand.ToLower();
+
+            // special case to handle command without number suffix
+            if (chipCommandLower.Equals("bgmwav"))
+            {
+                currentChip.IsBGM = true;
+                continue;
+            }
+
+            string chipCommandPrefix = chipCommandLower.Substring(0, chipCommandLower.Length - 2);
+            if (chipCommandPrefix.Equals("wav"))
+            {
+                if (isChipValid)
+                {
+                    int chipIndex = DTXHelper.Base36ToInt(chipCommand);
+                    chipList.Add(chipIndex, currentChip);
+                }
+
+                currentChip = new ChipInfo();
+
+                string filePath = GetFileAbsolutePath(commandObject.Value);
+                StartCoroutine(DTXHelper.GetAudioClip(filePath, (audioClip) => {
+                    currentChip.AudioClip = audioClip;
+                    currentChip.IsChipLoaded = true;
+                    Debug.Log("Chip loaded");
+                }, () => {
+                    Debug.LogError(string.Format("Error loading {0}", filePath));
+                }));
+            }
+            else if (chipCommandPrefix.Equals("pan"))
+            {
+                currentChip.Pan = Convert.ToInt32(commandObject.Value);
+            }
+            else if (chipCommandPrefix.Equals("volume"))
+            {
+                currentChip.Volume = Convert.ToInt32(commandObject.Value);
+            }
+            else
+            {
+                Debug.LogWarning(string.Format("Unsupported chip command {0}", chipCommand));
+                continue;
+            }
+        }
     }
 
     private void SetupAVIInfo(string[] commandGroup)
@@ -243,7 +302,7 @@ public class DTXInputOutput : MonoBehaviour
 
     private bool IsChipInfo(CommandObject commandObject)
     {
-        return commandObject.Command.Substring(0, 3).ToLower().Equals("wav");
+        return commandObject.Command.Substring(0, commandObject.Command.Length - 2).ToLower().Equals("wav");
     }
 
     private bool IsAVIInfo(CommandObject commandObject)
