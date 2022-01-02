@@ -157,6 +157,11 @@ public class DTXInputOutput : MonoBehaviour
         return true;
     }
 
+    public string GetFileAbsolutePath(string relativePath)
+    {
+        return string.Format("{0}\\{1}", fileInfo.AbsoluteFolderPath, relativePath);
+    }
+
     private void SetupMusicInfo(string[] commandGroup)
     {
         musicInfo = new MusicInfo();
@@ -181,7 +186,7 @@ public class DTXInputOutput : MonoBehaviour
             }
             else if (command.Equals("preview"))
             {
-                musicInfo.PreviewSound = commandObject.Value;
+                musicInfo.PreviewSound = GetFileAbsolutePath(commandObject.Value);
             }
             else if (command.Equals("preimage"))
             {
