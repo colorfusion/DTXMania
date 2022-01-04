@@ -70,7 +70,7 @@ public class DTXInputOutput : MonoBehaviour
     public struct Chip
     {
         public int ChipIndex;
-        public int Time;
+        public double Time;
 
         public int LaneIndex;
     }
