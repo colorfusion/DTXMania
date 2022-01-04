@@ -235,10 +235,9 @@ public class DTXInputOutput : MonoBehaviour
     private void SetupChipInfo(string[] commandGroup)
     {
         Debug.Log("Loading Chip Info");
-        chipList = new Dictionary<int, ChipInfo>();
+        chipInfoList = new Dictionary<int, ChipInfo>();
 
         ChipInfo currentChip = new ChipInfo();
-        bool isChipValid = false;
         foreach(string commandString in commandGroup)
         {
             if (!IsValidCommand(commandString))
@@ -261,13 +260,9 @@ public class DTXInputOutput : MonoBehaviour
             string chipCommandPrefix = chipCommandLower.Substring(0, chipCommandLower.Length - 2);
             if (chipCommandPrefix.Equals("wav"))
             {
-                if (isChipValid)
-                {
-                    int chipIndex = DTXHelper.Base36ToInt(chipCommand);
-                    chipList.Add(chipIndex, currentChip);
-                }
-
+                int chipIndex = DTXHelper.Base36ToInt(chipCommand);
                 currentChip = new ChipInfo();
+                chipInfoList.Add(chipIndex, currentChip);
 
                 string filePath = GetFileAbsolutePath(commandObject.Value);
                 StartCoroutine(DTXHelper.GetAudioClip(filePath, (audioClip) => {
