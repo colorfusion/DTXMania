@@ -108,6 +108,8 @@ public class DTXInputOutput : MonoBehaviour
 
     public Dictionary<int, Lane> laneList;
 
+    public Dictionary<int, int> BPMList;
+
     public List<Chip> chipList;
     #endregion
 
@@ -314,7 +316,30 @@ public class DTXInputOutput : MonoBehaviour
 
     private void SetupBPMInfo(string[] commandGroup)
     {
+        Debug.Log("Loading BPM info");
+        BPMList = new Dictionary<int, int>();
 
+        foreach(string commandString in commandGroup)
+        {
+            if (!IsValidCommand(commandString))
+            {
+                // ignore lines that are not command parameters
+                continue;
+            }
+
+            CommandObject commandObject = BuildCommand(commandString);
+            string chipCommand = commandObject.Command;
+
+            if (!chipCommand.Substring(0, 3).Equals("BPM"))
+            {
+                // ignore command if it not a bpm setting
+                continue;
+            }
+
+            int bpmIndex = DTXHelper.Base36ToInt(chipCommand.Substring(chipCommand.Length - 2));
+
+            BPMList.Add(bpmIndex, Convert.ToInt32(commandObject.Value));
+        }
     }
 
     private void SetupSongChipInfo(string[] commandGroup)
