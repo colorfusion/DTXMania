@@ -99,7 +99,11 @@ public class DTXInputOutput : MonoBehaviour
     public MusicInfo musicInfo;
     public FileInformation fileInfo;
 
-    public Dictionary<int, ChipInfo> chipList;
+    public Dictionary<int, ChipInfo> chipInfoList;
+
+    public Dictionary<int, Lane> laneList;
+
+    public List<Chip> chipList;
     #endregion
 
     #region Methods
