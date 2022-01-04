@@ -59,10 +59,19 @@ public class DTXInputOutput : MonoBehaviour
     }
 
     [System.Serializable]
+    public struct Lane
+    {
+        public Color Color;
+        public Texture2D Icon;
+    }
+
+    [System.Serializable]
     public struct Chip
     {
         public int ChipIndex;
         public int Time;
+
+        public int LaneIndex;
     }
     #endregion
 
