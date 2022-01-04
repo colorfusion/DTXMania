@@ -207,7 +207,7 @@ public class DTXInputOutput : MonoBehaviour
             }
             else if (command.Equals("preview"))
             {
-                musicInfo.PreviewSound = GetFileAbsolutePath(commandObject.Value);
+                musicInfo.PreviewSound = commandObject.Value;
             }
             else if (command.Equals("preimage"))
             {

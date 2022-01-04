@@ -19,10 +19,11 @@ public class DTXFileLoadTest : MonoBehaviour
             audioSource = gameObject.AddComponent<AudioSource>();
         }
 
-        StartCoroutine(DTXHelper.GetAudioClip(dtxIO.musicInfo.PreviewSound, (audioClip) => {
+        string filePath = dtxIO.GetFileAbsolutePath(dtxIO.musicInfo.PreviewSound);
+        StartCoroutine(DTXHelper.GetAudioClip(filePath, (audioClip) => {
             // Debug.Log(string.Format("Playing {0}", dtxIO.musicInfo.PreviewSound));
             // audioSource.PlayOneShot(audioClip);
-        }, (errorMsg) => {
+        }, (_) => {
             
         }));
     }
