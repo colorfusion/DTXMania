@@ -344,7 +344,71 @@ public class DTXInputOutput : MonoBehaviour
 
     private void SetupSongChipInfo(string[] commandGroup)
     {
+        Debug.Log("Loading song chip info");
+        chipList = new List<Chip>();
+        
+        int currentBPM = 120;
+        double currentTime = 0;
+        // assume time signature is 4/4
+        double measureLength = 60000.0 / currentBPM * 4;
+        int currentMeasureNumber = 0;
+        foreach(string commandString in commandGroup)
+        {
+            if (!IsValidCommand(commandString))
+            {
+                // ignore lines that are not command parameters
+                continue;
+            }
 
+            CommandObject commandObject = BuildCommand(commandString);
+            string chipCommand = commandObject.Command;
+            string commandValue = commandObject.Value;
+
+            int measureNumber = Convert.ToInt32(chipCommand.Substring(0, 3));
+            int laneIndex = DTXHelper.Base36ToInt(chipCommand.Substring(chipCommand.Length - 2));
+
+            if (measureNumber != currentMeasureNumber)
+            {
+                currentTime += measureLength * (measureNumber - currentMeasureNumber);
+                currentMeasureNumber = measureNumber;
+            }
+
+            if (laneIndex == LaneIndexBPM)
+            {
+                int bpmIndex = DTXHelper.Base36ToInt(commandObject.Value);
+                int bpm;
+                if (BPMList.TryGetValue(bpmIndex, out bpm))
+                {
+                    currentBPM = bpm;
+                    measureLength = 60000.0 / currentBPM * 4;
+                }
+            }
+            else
+            {
+                // song chip lane handling
+                int totalBeats = commandObject.Value.Length / 2;
+                double beatLength = measureLength / totalBeats;
+
+                for (int beatIndex = 0; beatIndex < totalBeats; ++beatIndex)
+                {
+                    int chipIndex = DTXHelper.Base36ToInt(commandValue.Substring(beatIndex * 2, 2));
+
+                    if (chipIndex == InvalidSongChipIndex)
+                    {
+                        // ignore beat if no chip is used
+                        continue;
+                    }
+
+                    Chip songChip = new Chip();
+
+                    songChip.ChipIndex = chipIndex;
+                    songChip.LaneIndex = laneIndex;
+                    songChip.Time = currentTime + beatIndex * beatLength;
+
+                    chipList.Add(songChip);
+                }
+            }
+        }
     }
 
     private bool IsValidCommand(string command)
