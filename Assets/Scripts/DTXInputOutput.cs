@@ -50,6 +50,7 @@ public class DTXInputOutput : MonoBehaviour
     public struct ChipInfo
     {
         public AudioClip AudioClip;
+        public AudioSource TargetAudioSource;
         public bool IsChipLoaded;
         public bool IsBGM;
         public int Volume;
@@ -100,6 +101,7 @@ public class DTXInputOutput : MonoBehaviour
     public FileInformation fileInfo;
 
     public Dictionary<int, ChipInfo> chipInfoList;
+    public Dictionary<int, AudioSource> audioSourceList;
 
     public Dictionary<int, Lane> laneList;
 
