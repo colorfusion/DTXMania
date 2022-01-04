@@ -15,6 +15,13 @@ public class DTXInputOutput : MonoBehaviour
         Write
     }
 
+    public struct CommandObject
+    {
+        public string Command;
+        public string Value;
+    }
+
+    [System.Serializable]
     public struct FileInformation
     {
         public string AbsoluteFilePath;
@@ -23,6 +30,7 @@ public class DTXInputOutput : MonoBehaviour
         public long FileSize;
     }
 
+    [System.Serializable]
     public struct MusicInfo
     {
         public string Title;
@@ -38,12 +46,7 @@ public class DTXInputOutput : MonoBehaviour
         public int Duration;
     }
 
-    public struct CommandObject
-    {
-        public string Command;
-        public string Value;
-    }
-
+    [System.Serializable]
     public struct ChipInfo
     {
         public AudioClip AudioClip;
@@ -55,6 +58,7 @@ public class DTXInputOutput : MonoBehaviour
         public bool IsVisible;
     }
 
+    [System.Serializable]
     public struct Chip
     {
         public int ChipIndex;
