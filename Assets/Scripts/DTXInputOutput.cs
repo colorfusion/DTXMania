@@ -93,6 +93,9 @@ public class DTXInputOutput : MonoBehaviour
 
     #region Constants
     private const char CommandPrefix = '#';
+    private const int LaneIndexBPM = 8; // 08
+
+    private const int InvalidSongChipIndex = 0;
     #endregion
 
     #region Fields
