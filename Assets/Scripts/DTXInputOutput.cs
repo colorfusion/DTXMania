@@ -241,6 +241,7 @@ public class DTXInputOutput : MonoBehaviour
         chipInfoList = new Dictionary<int, ChipInfo>();
 
         ChipInfo currentChip = new ChipInfo();
+        int lastChipIndex = -1;
         foreach(string commandString in commandGroup)
         {
             if (!IsValidCommand(commandString))
@@ -263,15 +264,23 @@ public class DTXInputOutput : MonoBehaviour
             string chipCommandPrefix = chipCommandLower.Substring(0, chipCommandLower.Length - 2);
             if (chipCommandPrefix.Equals("wav"))
             {
-                int chipIndex = DTXHelper.Base36ToInt(chipCommand);
+                if (lastChipIndex != -1)
+                {
+                    chipInfoList.Add(lastChipIndex, currentChip);
+                }
+
+                lastChipIndex = DTXHelper.Base36ToInt(chipCommand.Substring(chipCommand.Length - 2));
                 currentChip = new ChipInfo();
-                chipInfoList.Add(chipIndex, currentChip);
 
                 string filePath = GetFileAbsolutePath(commandObject.Value);
+                int targetChipIndex = lastChipIndex;
                 StartCoroutine(DTXHelper.GetAudioClip(filePath, (audioClip) => {
-                    currentChip.AudioClip = audioClip;
-                    currentChip.IsChipLoaded = true;
-                    Debug.Log("Chip loaded");
+                    ChipInfo currentChipInfo = chipInfoList[targetChipIndex];
+                    currentChipInfo.AudioClip = audioClip;
+                    currentChipInfo.IsChipLoaded = true;
+
+                    chipInfoList[targetChipIndex] = currentChipInfo;
+                    Debug.Log(string.Format("Chip loaded into {0}", targetChipIndex));
                 }, (errorMsg) => {
                     Debug.LogError(string.Format("Error loading {0}", filePath));
                 }));
@@ -289,6 +298,12 @@ public class DTXInputOutput : MonoBehaviour
                 Debug.LogWarning(string.Format("Unsupported chip command {0}", chipCommand));
                 continue;
             }
+        }
+
+        if (lastChipIndex != -1)
+        {
+            // add last chip if it is valid
+            chipInfoList.Add(lastChipIndex, currentChip);
         }
     }
 
