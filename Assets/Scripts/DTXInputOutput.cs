@@ -55,8 +55,8 @@ public class DTXInputOutput : MonoBehaviour
         public AudioSource TargetAudioSource;
         public bool IsChipLoaded;
         public bool IsBGM;
-        public int Volume;
-        public int Pan;
+        public float Volume;
+        public float Pan;
 
         public bool IsVisible;
     }
@@ -102,6 +102,8 @@ public class DTXInputOutput : MonoBehaviour
 
     #region Fields
     private OperationType ioType;
+
+    public SoundManager soundManager;
     public MusicInfo musicInfo;
     public FileInformation fileInfo;
 
@@ -116,7 +118,10 @@ public class DTXInputOutput : MonoBehaviour
 
     private bool isAutoPlay = false;
     private double startTime;
+    public double playbackDelay = 2.0;
     private int currentChipIndex = 0;
+
+    private double preloadTime = 1.0;
     #endregion
 
     #region Methods
@@ -209,38 +214,11 @@ public class DTXInputOutput : MonoBehaviour
 
     public void AutoPlaySong()
     {
-        Debug.Log("Auto playing song");
-        isAutoPlay = true;
-        startTime = AudioSettings.dspTime;
-        double dspTime = AudioSettings.dspTime;
-        double delay = 2.0;
-
-        int index = 0;
-        foreach (Chip chip in chipList)
-        {   
-            ChipInfo chipInfo;
-            if (chipInfoList.TryGetValue(chip.ChipIndex, out chipInfo))
-            {
-                if (chipInfo.AudioClip != null && chipInfo.TargetAudioSource != null)
-                {
-                    Debug.Log(string.Format("Playing {0} at {1}", chipInfo.AudioPath, dspTime + delay + chip.Time));
-                    AudioSource targetSource = chipInfo.TargetAudioSource;
-                    if (targetSource.clip == null)
-                    {
-                        targetSource.clip = chipInfo.AudioClip;
-                    }
-                    targetSource.PlayDelayed((float)(dspTime + delay + chip.Time));
-                }
-                else
-                {
-                    Debug.Log("Cannot find audio source to play chip");
-                }
-            }
-
-            if (++index == 100)
-            {
-                break;
-            }
+        if (soundManager != null)
+        {
+            Debug.Log("Auto playing song");
+            isAutoPlay = true;
+            startTime = AudioSettings.dspTime + playbackDelay;
         }
     }
 
@@ -250,6 +228,8 @@ public class DTXInputOutput : MonoBehaviour
         {
             double currentTime = AudioSettings.dspTime;
             double timeLapsed = currentTime - startTime;
+            // preload audio clips in advance
+            timeLapsed += preloadTime; 
 
             while(currentChipIndex < chipList.Count && chipList[currentChipIndex].Time <= timeLapsed)
             {
@@ -257,10 +237,14 @@ public class DTXInputOutput : MonoBehaviour
                 ChipInfo chipInfo;
                 if (chipInfoList.TryGetValue(chip.ChipIndex, out chipInfo))
                 {
-                    if (chipInfo.AudioClip != null && chipInfo.TargetAudioSource != null)
+                    if (chipInfo.AudioClip != null)
                     {
-                        AudioSource targetSource = chipInfo.TargetAudioSource;
-                        targetSource.PlayOneShot(chipInfo.AudioClip);
+                        SoundManager.AudioArgs playAudioArgs = new SoundManager.AudioArgs();
+                        playAudioArgs.audioClip = chipInfo.AudioClip;
+                        playAudioArgs.pan = chipInfo.Pan;
+                        playAudioArgs.volume = chipInfo.Volume;
+                        playAudioArgs.scheduledTime = startTime + chip.Time;
+                        soundManager.PlayAudio(playAudioArgs);
                     }
                     else
                     {
@@ -355,14 +339,13 @@ public class DTXInputOutput : MonoBehaviour
             {
                 if (lastChipIndex != -1)
                 {
-                    SetupTargetAudioSource(ref currentChip);
                     chipInfoList.Add(lastChipIndex, currentChip);
                 }
 
                 lastChipIndex = DTXHelper.Base36ToInt(chipCommand.Substring(chipCommand.Length - 2));
                 currentChip = new ChipInfo();
 
-                currentChip.Volume = 100;
+                currentChip.Volume = 1.0f;
                 currentChip.AudioPath = commandObject.Value;
                 currentChip.ChipIndex = lastChipIndex;
 
@@ -388,11 +371,11 @@ public class DTXInputOutput : MonoBehaviour
             }
             else if (chipCommandPrefix.Equals("pan"))
             {
-                currentChip.Pan = Convert.ToInt32(commandObject.Value);
+                currentChip.Pan = (float)Convert.ToInt32(commandObject.Value) / 100.0f;
             }
             else if (chipCommandPrefix.Equals("volume"))
             {
-                currentChip.Volume = Convert.ToInt32(commandObject.Value);
+                currentChip.Volume = (float)Convert.ToInt32(commandObject.Value) / 100.0f;
             }
             else
             {
@@ -403,24 +386,9 @@ public class DTXInputOutput : MonoBehaviour
 
         if (lastChipIndex != -1)
         {
-            SetupTargetAudioSource(ref currentChip);
             // add last chip if it is valid
             chipInfoList.Add(lastChipIndex, currentChip);
         }
-    }
-
-    private void SetupTargetAudioSource(ref ChipInfo chipInfo)
-    {
-        if (!audioSourceList.ContainsKey(chipInfo.ChipIndex))
-        {
-            AudioSource newSource = gameObject.AddComponent<AudioSource>();
-            newSource.playOnAwake = false;
-            newSource.panStereo = (float)chipInfo.Pan / 100;
-            newSource.volume = (float)chipInfo.Volume / 100;
-            audioSourceList.Add(chipInfo.ChipIndex, newSource);
-        }
-
-        chipInfo.TargetAudioSource = audioSourceList[chipInfo.ChipIndex];
     }
 
     private void SetupAVIInfo(string[] commandGroup)
