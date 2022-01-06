@@ -241,6 +241,7 @@ public class DTXInputOutput : MonoBehaviour
     {
         Debug.Log("Loading Chip Info");
         chipInfoList = new Dictionary<int, ChipInfo>();
+        audioSourceList = new Dictionary<int, AudioSource>();
 
         ChipInfo currentChip = new ChipInfo();
         int lastChipIndex = -1;
@@ -268,22 +269,34 @@ public class DTXInputOutput : MonoBehaviour
             {
                 if (lastChipIndex != -1)
                 {
+                    SetupTargetAudioSource(ref currentChip);
                     chipInfoList.Add(lastChipIndex, currentChip);
                 }
 
                 lastChipIndex = DTXHelper.Base36ToInt(chipCommand.Substring(chipCommand.Length - 2));
                 currentChip = new ChipInfo();
 
+                currentChip.Volume = 100;
+                currentChip.AudioPath = commandObject.Value;
+                currentChip.ChipIndex = lastChipIndex;
+
                 string filePath = GetFileAbsolutePath(commandObject.Value);
                 int targetChipIndex = lastChipIndex;
                 StartCoroutine(DTXHelper.GetAudioClip(filePath, (audioClip) => {
                     ChipInfo currentChipInfo = chipInfoList[targetChipIndex];
+                    audioClip.name = commandObject.Value;
                     currentChipInfo.AudioClip = audioClip;
                     currentChipInfo.IsChipLoaded = true;
 
                     chipInfoList[targetChipIndex] = currentChipInfo;
+
                     Debug.Log(string.Format("Chip loaded into {0}", targetChipIndex));
                 }, (errorMsg) => {
+                    ChipInfo currentChipInfo = chipInfoList[targetChipIndex];
+                    currentChipInfo.IsChipLoaded = true;
+
+                    chipInfoList[targetChipIndex] = currentChipInfo;
+
                     Debug.LogError(string.Format("Error loading {0}", filePath));
                 }));
             }
@@ -304,9 +317,24 @@ public class DTXInputOutput : MonoBehaviour
 
         if (lastChipIndex != -1)
         {
+            SetupTargetAudioSource(ref currentChip);
             // add last chip if it is valid
             chipInfoList.Add(lastChipIndex, currentChip);
         }
+    }
+
+    private void SetupTargetAudioSource(ref ChipInfo chipInfo)
+    {
+        if (!audioSourceList.ContainsKey(chipInfo.ChipIndex))
+        {
+            AudioSource newSource = gameObject.AddComponent<AudioSource>();
+            newSource.playOnAwake = false;
+            newSource.panStereo = (float)chipInfo.Pan / 100;
+            newSource.volume = (float)chipInfo.Volume / 100;
+            audioSourceList.Add(chipInfo.ChipIndex, newSource);
+        }
+
+        chipInfo.TargetAudioSource = audioSourceList[chipInfo.ChipIndex];
     }
 
     private void SetupAVIInfo(string[] commandGroup)
