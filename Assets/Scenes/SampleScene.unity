@@ -217,6 +217,7 @@ GameObject:
   - component: {fileID: 1313757438}
   - component: {fileID: 1313757437}
   - component: {fileID: 1313757439}
+  - component: {fileID: 1313757440}
   m_Layer: 0
   m_Name: GameObject
   m_TagString: Untagged
@@ -262,3 +263,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d126c14ae9392b2469eb98714049e856, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1313757440
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1313757436}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6635ed0273f927f42af119f4e4aae67c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  musicInfo:
+    Title: 
+    ArtistName: 
+    Comment: 
+    Genre: 
+    PreviewImage: 
+    PreviewMovie: 
+    PreviewSound: 
+    BackgroundImage: 
+    Level: 
+    BPM: 0
+    Duration: 0
+  fileInfo:
+    AbsoluteFilePath: 
+    AbsoluteFolderPath: 
+    FileSize: 0
+  chipInfoArr: []
+  chipList: []
