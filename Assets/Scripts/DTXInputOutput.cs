@@ -378,7 +378,7 @@ public class DTXInputOutput : MonoBehaviour
         int currentBPM = 120;
         double currentTime = 0;
         // assume time signature is 4/4
-        double measureLength = 60000.0 / currentBPM * 4;
+        double measureLength = 60d / currentBPM * 4;
         int currentMeasureNumber = 0;
         foreach(string commandString in commandGroup)
         {
@@ -408,7 +408,7 @@ public class DTXInputOutput : MonoBehaviour
                 if (BPMList.TryGetValue(bpmIndex, out bpm))
                 {
                     currentBPM = bpm;
-                    measureLength = 60000.0 / currentBPM * 4;
+                    measureLength = 60d / currentBPM * 4;
                 }
             }
             else
