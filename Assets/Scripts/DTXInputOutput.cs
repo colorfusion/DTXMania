@@ -49,6 +49,8 @@ public class DTXInputOutput : MonoBehaviour
     [System.Serializable]
     public struct ChipInfo
     {
+        public int ChipIndex;
+        public string AudioPath;
         public AudioClip AudioClip;
         public AudioSource TargetAudioSource;
         public bool IsChipLoaded;
@@ -111,6 +113,10 @@ public class DTXInputOutput : MonoBehaviour
     public Dictionary<int, int> BPMList;
 
     public List<Chip> chipList;
+
+    private bool isAutoPlay = false;
+    private double startTime;
+    private int currentChipIndex = 0;
     #endregion
 
     #region Methods
@@ -185,6 +191,86 @@ public class DTXInputOutput : MonoBehaviour
     public string GetFileAbsolutePath(string relativePath)
     {
         return string.Format("{0}\\{1}", fileInfo.AbsoluteFolderPath, relativePath);
+    }
+
+    public bool IsSongReady()
+    {
+        // check all chip info whether the audio file is loaded successfully
+        foreach(ChipInfo chipInfo in chipInfoList.Values)
+        {
+            if (!chipInfo.IsChipLoaded)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public void AutoPlaySong()
+    {
+        Debug.Log("Auto playing song");
+        isAutoPlay = true;
+        startTime = AudioSettings.dspTime;
+        double dspTime = AudioSettings.dspTime;
+        double delay = 2.0;
+
+        int index = 0;
+        foreach (Chip chip in chipList)
+        {   
+            ChipInfo chipInfo;
+            if (chipInfoList.TryGetValue(chip.ChipIndex, out chipInfo))
+            {
+                if (chipInfo.AudioClip != null && chipInfo.TargetAudioSource != null)
+                {
+                    Debug.Log(string.Format("Playing {0} at {1}", chipInfo.AudioPath, dspTime + delay + chip.Time));
+                    AudioSource targetSource = chipInfo.TargetAudioSource;
+                    if (targetSource.clip == null)
+                    {
+                        targetSource.clip = chipInfo.AudioClip;
+                    }
+                    targetSource.PlayDelayed((float)(dspTime + delay + chip.Time));
+                }
+                else
+                {
+                    Debug.Log("Cannot find audio source to play chip");
+                }
+            }
+
+            if (++index == 100)
+            {
+                break;
+            }
+        }
+    }
+
+    public void Update()
+    {
+        if (isAutoPlay)
+        {
+            double currentTime = AudioSettings.dspTime;
+            double timeLapsed = currentTime - startTime;
+
+            while(currentChipIndex < chipList.Count && chipList[currentChipIndex].Time <= timeLapsed)
+            {
+                Chip chip = chipList[currentChipIndex];
+                ChipInfo chipInfo;
+                if (chipInfoList.TryGetValue(chip.ChipIndex, out chipInfo))
+                {
+                    if (chipInfo.AudioClip != null && chipInfo.TargetAudioSource != null)
+                    {
+                        AudioSource targetSource = chipInfo.TargetAudioSource;
+                        targetSource.PlayOneShot(chipInfo.AudioClip);
+                    }
+                    else
+                    {
+                        Debug.Log("Cannot find audio source to play chip");
+                    }
+                }
+
+                ++currentChipIndex;
+            }
+        }
     }
 
     private void SetupMusicInfo(string[] commandGroup)
