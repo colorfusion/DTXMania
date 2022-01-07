@@ -184,6 +184,7 @@ public class DTXInputOutput : MonoBehaviour
 
     public List<Chip> chipList;
 
+    private bool isPlaying = false;
     private bool isAutoPlay = false;
     private double startTime;
     public double playbackDelay = 2.0;
