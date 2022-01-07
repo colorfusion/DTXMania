@@ -1,5 +1,7 @@
 using System;
 using System.Collections;
+using System.Text;
+using System.IO;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -32,7 +34,7 @@ public class DTXHelper
 
     public static IEnumerator GetAudioClip(string audioPath, Action<AudioClip> successCallback, Action<string> failCallback)
     {
-        Debug.Log(string.Format("Loading {0}",audioPath));
+        // Debug.Log(string.Format("Loading {0}",audioPath));
         using(UnityWebRequest uwr = UnityWebRequestMultimedia.GetAudioClip(audioPath, AudioType.OGGVORBIS))
         {
             yield return uwr.SendWebRequest();
@@ -45,5 +47,32 @@ public class DTXHelper
 
             successCallback(DownloadHandlerAudioClip.GetContent(uwr));
         }
+    }
+
+    public static string ReadInputFile(string fullPath, bool processBuffer = true)
+    {
+        StreamReader inputStream = new StreamReader(fullPath, Encoding.GetEncoding( "shift-jis" ));
+        string textInputBuffer = inputStream.ReadToEnd();
+        if (processBuffer)
+        {
+            textInputBuffer = ProcessInputBuffer(textInputBuffer);
+        }
+        inputStream.Close();
+
+        return textInputBuffer;
+    }
+    
+    public static string ProcessInputBuffer(string inputBuffer)
+    {
+        inputBuffer = inputBuffer.Replace(Environment.NewLine, "\n");
+        inputBuffer = inputBuffer.Replace('\t', ' ');
+
+        return inputBuffer;
+    }
+
+    public static bool IsValidCommand(string command)
+    {
+        const char CommandPrefix = '#';
+        return command.Length != 0 && command[0] == CommandPrefix && command.Split(':').Length >= 2;
     }
 }
