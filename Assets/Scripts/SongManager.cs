@@ -4,42 +4,43 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
+[Serializable]
+public enum DifficultyType
+{
+    Basic,
+    Advanced,
+    Extreme,
+    Master,
+    DTX
+}
+
+[Serializable]
+public struct DifficultyInfo
+{
+    public string Name;
+    public string Level;
+    public string FilePath;
+    public DifficultyType Type;
+}
+    
+[Serializable]    
+public class SongInfo
+{
+    public string Name;
+    public string Artist;
+
+    public string Path;
+
+    public List<DifficultyInfo> DifficultyList;
+
+    public SongInfo()
+    {
+        DifficultyList = new List<DifficultyInfo>();
+    }
+}
+
 public class SongManager : MonoBehaviour
 {
-    [Serializable]
-    public enum DifficultyType
-    {
-        Basic,
-        Advanced,
-        Extreme,
-        Master,
-        DTX
-    }
-
-    [Serializable]
-    public struct DifficultyInfo
-    {
-        public string Name;
-        public string Level;
-        public string FilePath;
-        public DifficultyType Type;
-    }
-
-    [Serializable]    
-    public class SongInfo
-    {
-        public string Name;
-        public string Artist;
-
-        public string Path;
-
-        public List<DifficultyInfo> DifficultyList;
-
-        public SongInfo()
-        {
-            DifficultyList = new List<DifficultyInfo>();
-        }
-    }
 
     public string songFolderPath;
 
@@ -47,14 +48,20 @@ public class SongManager : MonoBehaviour
 
     private string baseAssetsPath = Application.streamingAssetsPath;
 
+    public bool IsLoaded = false;
+
     public List<SongInfo> songList;
 
     // Start is called before the first frame update
     void Start()
     {
-        fullSongFolderPath = baseAssetsPath + songFolderPath;
         songList = new List<SongInfo>();
-        ParseSongDirectory(new DirectoryInfo(fullSongFolderPath));
+
+        DirectoryInfo songDirectoryInfo = new DirectoryInfo(baseAssetsPath + songFolderPath);
+        fullSongFolderPath = songDirectoryInfo.FullName;
+        ParseSongDirectory(songDirectoryInfo);
+        
+        IsLoaded = true;
     }
 
     // Update is called once per frame
