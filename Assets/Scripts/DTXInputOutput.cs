@@ -194,6 +194,55 @@ public class DTXInputOutput : MonoBehaviour
     #endregion
 
     #region Methods
+    public void Start()
+    {
+        GameObject soundManagerObj = GameObject.Find("SoundManager");
+        if (soundManagerObj != null)
+        {
+            soundManager = soundManagerObj.GetComponent<SoundManager>();
+        }
+    }
+
+    public void Update()
+    {
+        if (!isPlaying)
+        {
+            return;
+        }
+
+        if (isAutoPlay)
+        {
+            double currentTime = AudioSettings.dspTime;
+            double timeLapsed = currentTime - startTime;
+            // preload audio clips in advance
+            timeLapsed += preloadTime; 
+
+            while(currentChipIndex < chipList.Count && chipList[currentChipIndex].Time <= timeLapsed)
+            {
+                Chip chip = chipList[currentChipIndex];
+                ChipInfo chipInfo;
+                if (chipInfoList.TryGetValue(chip.ChipIndex, out chipInfo))
+                {
+                    if (chipInfo.AudioClip != null)
+                    {
+                        SoundManager.AudioArgs playAudioArgs = new SoundManager.AudioArgs();
+                        playAudioArgs.audioClip = chipInfo.AudioClip;
+                        playAudioArgs.pan = chipInfo.Pan;
+                        playAudioArgs.volume = chipInfo.Volume;
+                        playAudioArgs.scheduledTime = startTime + chip.Time;
+                        soundManager.PlayAudio(playAudioArgs);
+                    }
+                    else
+                    {
+                        Debug.Log("Cannot find audio source to play chip");
+                    }
+                }
+
+                ++currentChipIndex;
+            }
+        }
+    }
+
     private string BuildAbsolutePath(string relativePath)
     {
         string songDirectory = Application.streamingAssetsPath + "/Songs";
@@ -284,42 +333,8 @@ public class DTXInputOutput : MonoBehaviour
         {
             Debug.Log("Auto playing song");
             isAutoPlay = true;
+            isPlaying = true;
             startTime = AudioSettings.dspTime + playbackDelay;
-        }
-    }
-
-    public void Update()
-    {
-        if (isAutoPlay)
-        {
-            double currentTime = AudioSettings.dspTime;
-            double timeLapsed = currentTime - startTime;
-            // preload audio clips in advance
-            timeLapsed += preloadTime; 
-
-            while(currentChipIndex < chipList.Count && chipList[currentChipIndex].Time <= timeLapsed)
-            {
-                Chip chip = chipList[currentChipIndex];
-                ChipInfo chipInfo;
-                if (chipInfoList.TryGetValue(chip.ChipIndex, out chipInfo))
-                {
-                    if (chipInfo.AudioClip != null)
-                    {
-                        SoundManager.AudioArgs playAudioArgs = new SoundManager.AudioArgs();
-                        playAudioArgs.audioClip = chipInfo.AudioClip;
-                        playAudioArgs.pan = chipInfo.Pan;
-                        playAudioArgs.volume = chipInfo.Volume;
-                        playAudioArgs.scheduledTime = startTime + chip.Time;
-                        soundManager.PlayAudio(playAudioArgs);
-                    }
-                    else
-                    {
-                        Debug.Log("Cannot find audio source to play chip");
-                    }
-                }
-
-                ++currentChipIndex;
-            }
         }
     }
 
