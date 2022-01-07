@@ -15,6 +15,13 @@ public struct CommandObject
     {
         CommandObject commandObject = new CommandObject();
         
+        // strip comments from command if required
+        if (commandLine.IndexOf(';') != -1)
+        {
+            Debug.Log(commandLine);
+            commandLine = commandLine.Substring(0, commandLine.IndexOf(';')).Trim();
+        }
+
         List<string> commandArr = new List<string>(commandLine.Substring(1).Split(':'));
 
         commandObject.Command = commandArr[0];
