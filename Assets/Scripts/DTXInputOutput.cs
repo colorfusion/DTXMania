@@ -189,7 +189,7 @@ public class DTXInputOutput : MonoBehaviour
     public double playbackDelay = 2.0;
     private int currentChipIndex = 0;
 
-    private double preloadTime = 1.0;
+    private double preloadTime = 2.0;
     #endregion
 
     #region Methods
