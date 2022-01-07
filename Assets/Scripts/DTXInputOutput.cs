@@ -364,7 +364,7 @@ public class DTXInputOutput : MonoBehaviour
                 currentChip.AudioPath = commandObject.Value;
                 currentChip.ChipIndex = lastChipIndex;
 
-                string filePath = GetFileAbsolutePath(commandObject.Value);
+                string filePath = GetFileAbsolutePath(currentChip.AudioPath);
                 int targetChipIndex = lastChipIndex;
                 StartCoroutine(DTXHelper.GetAudioClip(filePath, (audioClip) => {
                     ChipInfo currentChipInfo = chipInfoList[targetChipIndex];
