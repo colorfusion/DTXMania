@@ -23,7 +23,7 @@ public class DTXFileLoadTest : MonoBehaviour
             if (dtxIO.IsSongReady())
             {
                 isSongReady = true;
-                dtxIO.AutoPlaySong();
+                // dtxIO.AutoPlaySong();
             }
             else
             {
