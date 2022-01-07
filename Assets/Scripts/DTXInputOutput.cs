@@ -225,6 +225,12 @@ public class DTXInputOutput : MonoBehaviour
         foreach(string fileLine in textInputArray)
         {
             string[] commandGroup = fileLine.Trim().Split('\n');
+
+            if (!DTXHelper.IsValidCommand(commandGroup[0]))
+            {
+                continue;
+            }
+
             CommandObject commandObject = CommandObject.BuildCommand(commandGroup[0]);
 
             if (MusicInfo.IsValidData(commandGroup))
