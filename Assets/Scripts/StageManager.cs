@@ -5,9 +5,7 @@ using UnityEngine;
 public class StageManager : MonoBehaviour
 {
     public DTXInputOutput dtxIO;
-    public bool IsLoaded;
-    public bool IsPlaying;
-    public bool IsAutoPlay;
+    private bool isSongSelected = false;
     // Start is called before the first frame update
     void Start()
     {
@@ -21,30 +19,30 @@ public class StageManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (IsLoaded)
-        {
-            if (!IsPlaying && dtxIO.IsSongReady())
-            {
-                IsPlaying = true;
 
-                if (IsAutoPlay)
-                {
-                    dtxIO.AutoPlaySong();
-                }
-            }
-        }
     }
 
     public void PlaySong(SongInfo songInfo, int difficulty, bool autoPlay)
     {
-        IsAutoPlay = autoPlay;
+        isSongSelected = true;
+        StartCoroutine(LoadAndPlaySelectedSong(songInfo, difficulty, autoPlay));
+    }
 
+    private IEnumerator LoadAndPlaySelectedSong(SongInfo songInfo, int difficulty, bool autoPlay)
+    {
         string relativePath = string.Format("{0}\\{1}", songInfo.Path, songInfo.DifficultyList[difficulty].FilePath);
         Debug.Log(string.Format("Playing {0}", relativePath));
         
         dtxIO.LoadFile(relativePath);
 
-        IsLoaded = true;
-        IsPlaying = false;
+        if (!dtxIO.IsSongReady())
+        {
+            yield return new WaitForSeconds(0.1f);
+        }
+
+        if (autoPlay)
+        {
+            dtxIO.PlaySong(autoPlay);
+        }
     }
 }

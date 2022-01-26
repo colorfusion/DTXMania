@@ -226,17 +226,15 @@ public class DTXInputOutput : MonoBehaviour
             return;
         }
 
-        if (isAutoPlay)
-        {
-            double currentTime = AudioSettings.dspTime;
-            double timeLapsed = currentTime - startTime;
-            // preload audio clips in advance
-            timeLapsed += preloadTime; 
+        double currentTime = AudioSettings.dspTime;
+        double timeLapsed = currentTime - startTime + preloadTime;
 
-            while(currentChipIndex < chipList.Count && chipList[currentChipIndex].Time <= timeLapsed)
+        while(currentChipIndex < chipList.Count && chipList[currentChipIndex].Time <= timeLapsed)
+        {
+            Chip chip = chipList[currentChipIndex];
+            ChipInfo chipInfo;
+            if (isAutoPlay)
             {
-                Chip chip = chipList[currentChipIndex];
-                ChipInfo chipInfo;
                 if (chipInfoList.TryGetValue(chip.ChipIndex, out chipInfo))
                 {
                     if (chipInfo.AudioClip != null)
@@ -250,12 +248,20 @@ public class DTXInputOutput : MonoBehaviour
                     }
                     else
                     {
-                        Debug.Log("Cannot find audio source to play chip");
+                        // Debug.Log("Cannot find audio source to play chip");
                     }
                 }
-
-                ++currentChipIndex;
             }
+
+            ++currentChipIndex;
+        }
+
+        if (currentChipIndex >= chipList.Count)
+        {
+            isPlaying = false;
+            isAutoPlay = false;
+
+            // Debug.Log("Auto play complete");
         }
     }
 
@@ -353,12 +359,21 @@ public class DTXInputOutput : MonoBehaviour
         return true;
     }
 
-    public void AutoPlaySong()
+    public bool IsSongPlaying()
     {
-        if (soundManager != null)
+        return isPlaying;
+    }
+
+    public void PlaySong(bool autoPlay)
+    {
+        if (!isPlaying && soundManager != null)
         {
-            Debug.Log("Auto playing song");
-            isAutoPlay = true;
+            if (autoPlay)
+            {
+                // Debug.Log("Auto playing song");
+                isAutoPlay = autoPlay;
+            }
+
             isPlaying = true;
             startTime = AudioSettings.dspTime + playbackDelay;
         }
