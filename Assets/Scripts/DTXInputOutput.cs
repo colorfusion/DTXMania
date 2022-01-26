@@ -176,7 +176,6 @@ public class DTXInputOutput : MonoBehaviour
     public FileInformation fileInfo;
 
     public Dictionary<int, ChipInfo> chipInfoList;
-    public Dictionary<int, AudioSource> audioSourceList;
 
     public Dictionary<int, Lane> laneList;
 
@@ -342,7 +341,6 @@ public class DTXInputOutput : MonoBehaviour
     {
         Debug.Log("Loading Chip Info");
         chipInfoList = new Dictionary<int, ChipInfo>();
-        audioSourceList = new Dictionary<int, AudioSource>();
 
         ChipInfo currentChip = new ChipInfo();
         int lastChipIndex = -1;
