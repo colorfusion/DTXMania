@@ -18,7 +18,7 @@ public struct CommandObject
         // strip comments from command if required
         if (commandLine.IndexOf(';') != -1)
         {
-            Debug.Log(commandLine);
+            // Debug.Log(commandLine);
             commandLine = commandLine.Substring(0, commandLine.IndexOf(';')).Trim();
         }
 
@@ -60,7 +60,7 @@ public class MusicInfo
 
     public void Setup(string[] commandGroup)
     {
-        Debug.Log("Loading Music Info");
+        // Debug.Log("Loading Music Info");
         foreach(string commandString in commandGroup)
         {
             if (!DTXHelper.IsValidCommand(commandString))
@@ -183,6 +183,7 @@ public class DTXInputOutput : MonoBehaviour
 
     public List<Chip> chipList;
 
+    private bool isFileLoaded = false;
     private bool isPlaying = false;
     private bool isAutoPlay = false;
     private double startTime;
@@ -200,6 +201,22 @@ public class DTXInputOutput : MonoBehaviour
         {
             soundManager = soundManagerObj.GetComponent<SoundManager>();
         }
+
+        chipInfoList = new Dictionary<int, ChipInfo>();
+        laneList = new Dictionary<int, Lane>();
+        BPMList = new Dictionary<int, int>();
+        chipList = new List<Chip>();
+    }
+
+    public void Reset()
+    {
+        soundManager.Reset();
+        isFileLoaded = isPlaying = isAutoPlay = false;
+
+        chipInfoList.Clear();
+        laneList.Clear();
+        BPMList.Clear();
+        chipList.Clear();
     }
 
     public void Update()
@@ -263,6 +280,8 @@ public class DTXInputOutput : MonoBehaviour
 
     public bool LoadFile(string relativePath)
     {
+        Reset();
+
         SetupFileInfo(BuildAbsolutePath(relativePath));
         Debug.Log(string.Format("Loading {0}", relativePath));
 
@@ -303,6 +322,9 @@ public class DTXInputOutput : MonoBehaviour
                 SetupSongChipInfo(commandGroup);
             }
         }
+        
+        Debug.Log("File loaded");
+        isFileLoaded = true;
 
         return true;
     }
@@ -314,6 +336,11 @@ public class DTXInputOutput : MonoBehaviour
 
     public bool IsSongReady()
     {
+        if (!isFileLoaded)
+        {
+            return false;
+        }
+
         // check all chip info whether the audio file is loaded successfully
         foreach(ChipInfo chipInfo in chipInfoList.Values)
         {
@@ -339,8 +366,7 @@ public class DTXInputOutput : MonoBehaviour
 
     private void SetupChipInfo(string[] commandGroup)
     {
-        Debug.Log("Loading Chip Info");
-        chipInfoList = new Dictionary<int, ChipInfo>();
+        // Debug.Log("Loading Chip Info");
 
         ChipInfo currentChip = new ChipInfo();
         int lastChipIndex = -1;
@@ -408,7 +434,7 @@ public class DTXInputOutput : MonoBehaviour
             }
             else
             {
-                Debug.LogWarning(string.Format("Unsupported chip command {0}", chipCommand));
+                // Debug.LogWarning(string.Format("Unsupported chip command {0}", chipCommand));
                 continue;
             }
         }
@@ -427,8 +453,7 @@ public class DTXInputOutput : MonoBehaviour
 
     private void SetupBPMInfo(string[] commandGroup)
     {
-        Debug.Log("Loading BPM info");
-        BPMList = new Dictionary<int, int>();
+        // Debug.Log("Loading BPM info");
 
         foreach(string commandString in commandGroup)
         {
@@ -455,8 +480,7 @@ public class DTXInputOutput : MonoBehaviour
 
     private void SetupSongChipInfo(string[] commandGroup)
     {
-        Debug.Log("Loading song chip info");
-        chipList = new List<Chip>();
+        // Debug.Log("Loading song chip info");
         
         int currentBPM = 120;
         double currentTime = 0;
