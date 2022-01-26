@@ -19,6 +19,13 @@ public class SoundManager : MonoBehaviour
         {
             return currentTime > GetCompletedTime();
         }
+
+        public void Reset()
+        {
+            audioSource.Stop();
+            audioSource.clip = null;
+            audioSource.enabled = false;
+        }
     }
 
     public struct AudioArgs
@@ -67,12 +74,25 @@ public class SoundManager : MonoBehaviour
                 continue;
             }
 
-            mixer.audioSource.clip = null;
-            mixer.audioSource.enabled = false;
+            mixer.Reset();
 
             audioSourcePool.Enqueue(mixer.audioSource);
             audioSourceMixers.RemoveAt(i);
         }
+        currentPoolSize = audioSourcePool.Count;
+    }
+
+    public void Reset()
+    {
+        for(int i = audioSourceMixers.Count - 1; i >= 0; --i)
+        {
+            AudioSourceMixer mixer = audioSourceMixers[i];
+            mixer.Reset();
+
+            audioSourcePool.Enqueue(mixer.audioSource);
+            audioSourceMixers.RemoveAt(i);
+        }
+
         currentPoolSize = audioSourcePool.Count;
     }
 
